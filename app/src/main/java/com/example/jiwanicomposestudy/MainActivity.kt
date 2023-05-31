@@ -1,9 +1,11 @@
 package com.example.jiwanicomposestudy
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,7 +38,7 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
-                    Greeting("Android")
+                    MessageCard(msg = Message("jiwan's", "study"))
                 }
             }
         }
@@ -67,10 +69,17 @@ fun GreetingPreview() {
 //endregion
 
 @Composable
-@Preview(showBackground = true) //preview는 매개변수가 없는 함수에서만 사용이 가능하다.
+//preview는 매개변수가 없는 함수에서만 사용이 가능하다.
+@Preview(name = "Light Mode")
+// @Preview 주석을 추가해서 테마를 다르게 표현도 할 수 있음
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true, name = "Dark Mode")
 fun MessageCardPreviewed() {
     //MessageCard("Jiwan's study")
-    MessageCard(Message("jiwan", "study"))
+    JiwaniComposeStudyTheme {
+        Surface {
+            MessageCard(msg = Message("jiwan", "study"))
+        }
+    }
 }
 
 //region Layout + Image
@@ -92,13 +101,21 @@ fun MessageCard(msg: Message) {
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape)
+                .border(1.5.dp, MaterialTheme.colorScheme.secondary, CircleShape)
         )
         Spacer(modifier = Modifier.width(8.dp))
 
         Column {
-            Text(text = msg.author)
+            Text(
+                text = msg.author,
+                color = MaterialTheme.colorScheme.secondary,
+                style = MaterialTheme.typography.titleSmall
+            )
             Spacer(modifier = Modifier.height(4.dp))
-            Text(msg.body)
+
+            Surface(shape = MaterialTheme.shapes.medium, shadowElevation = 1.dp){
+                Text(text = msg.body, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(all = 4.dp))
+            }
         }
     }
 }
