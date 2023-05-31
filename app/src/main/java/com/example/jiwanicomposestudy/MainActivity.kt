@@ -6,7 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,7 +22,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ComposeNode
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
@@ -30,6 +32,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.jiwanicomposestudy.smaples.SampleData
 import com.example.jiwanicomposestudy.ui.theme.JiwaniComposeStudyTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 class MainActivity : ComponentActivity() {
 
@@ -125,9 +129,16 @@ fun MessageCard(msg: Message) {
                 .clip(CircleShape)
                 .border(1.5.dp, MaterialTheme.colorScheme.secondary, CircleShape)
         )
+
         Spacer(modifier = Modifier.width(8.dp))
 
-        Column {
+        // remember로 현재 상태를 저장하고 mutableStateOf로 변경된 상태를 추적
+        // 하위 요소중에서 remember의 상태를 사용하는 요소가 변경됨을 감지하면 자동으로 업데이트됨
+        // 이를 재구성(recomposition)이라고 함
+        var isExpanded by remember { mutableStateOf(false) }
+
+        // 클릭을 하면 isExpanded 값을 변경
+        Column(modifier =  Modifier.clickable { isExpanded = isExpanded.not() }) {
             Text(
                 text = msg.author,
                 color = MaterialTheme.colorScheme.secondary,
@@ -136,7 +147,13 @@ fun MessageCard(msg: Message) {
             Spacer(modifier = Modifier.height(4.dp))
 
             Surface(shape = MaterialTheme.shapes.medium, shadowElevation = 1.dp){
-                Text(text = msg.body, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(all = 4.dp))
+                Text(
+                    text = msg.body,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(all = 4.dp),
+                    // 클릭으로 isExpanded가 변경되고 mutableStateOf에서 변경된 상태를 감지하고 재구성함
+                    maxLines = if (isExpanded) Int.MAX_VALUE else 1
+                )
             }
         }
     }
