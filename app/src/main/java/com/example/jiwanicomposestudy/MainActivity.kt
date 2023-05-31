@@ -15,6 +15,7 @@ import com.example.jiwanicomposestudy.ui.theme.JiwaniComposeStudyTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // composable 함수를 호출하여 레이아웃을 표현
         setContent {
             JiwaniComposeStudyTheme {
                 // A surface container using the 'background' color from the theme
@@ -27,6 +28,17 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
+
+@Composable
+fun MessageCard(name: String) {
+    Text(name)
+}
+
+@Composable
+@Preview(showBackground = true) //preview는 매개변수가 없는 함수에서만 사용이 가능하다.
+fun MessageCardPreviewed() {
+    MessageCard("Jiwan's study")
 }
 
 @Composable
