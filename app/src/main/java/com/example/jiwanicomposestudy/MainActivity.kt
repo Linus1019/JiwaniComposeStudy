@@ -4,6 +4,8 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -136,6 +138,10 @@ fun MessageCard(msg: Message) {
         // 하위 요소중에서 remember의 상태를 사용하는 요소가 변경됨을 감지하면 자동으로 업데이트됨
         // 이를 재구성(recomposition)이라고 함
         var isExpanded by remember { mutableStateOf(false) }
+        // 요소의 상태 (지금은 isExpanded)가 변경되면 색상이 변경되는 animation을 생성
+        val surfaceColor by animateColorAsState(
+            if (isExpanded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+        )
 
         // 클릭을 하면 isExpanded 값을 변경
         Column(modifier =  Modifier.clickable { isExpanded = isExpanded.not() }) {
@@ -146,7 +152,9 @@ fun MessageCard(msg: Message) {
             )
             Spacer(modifier = Modifier.height(4.dp))
 
-            Surface(shape = MaterialTheme.shapes.medium, shadowElevation = 1.dp){
+            // 선언한 애니메이션은 Surface에서 사용
+            // 크기가 변경되는 애니메이션은 modifier를 사용... 뭔가 일관성이 없는거 같음...
+            Surface(shape = MaterialTheme.shapes.medium, shadowElevation = 1.dp, color = surfaceColor, modifier = Modifier.animateContentSize().padding(4.dp)) {
                 Text(
                     text = msg.body,
                     style = MaterialTheme.typography.bodySmall,
