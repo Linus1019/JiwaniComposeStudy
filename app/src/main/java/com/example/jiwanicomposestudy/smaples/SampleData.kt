@@ -1,6 +1,6 @@
 package com.example.jiwanicomposestudy.smaples
 
-import com.example.jiwanicomposestudy.Message
+import com.example.jiwanicomposestudy.steps.Step1.Message
 
 object SampleData {
     // Sample conversation data
