@@ -1,4 +1,4 @@
-package com.example.jiwanicomposestudy.steps
+package com.example.jiwanicomposestudy.steps.tutorial
 
 import android.content.res.Configuration
 import androidx.compose.animation.animateColorAsState
@@ -16,9 +16,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -107,7 +107,7 @@ class Step1 {
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .border(1.5.dp, MaterialTheme.colorScheme.secondary, CircleShape)
+                    .border(1.5.dp, MaterialTheme.colors.secondary, CircleShape)
             )
 
             Spacer(modifier = Modifier.width(8.dp))
@@ -118,24 +118,24 @@ class Step1 {
             var isExpanded by remember { mutableStateOf(false) }
             // 요소의 상태 (지금은 isExpanded)가 변경되면 색상이 변경되는 animation을 생성
             val surfaceColor by animateColorAsState(
-                if (isExpanded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+                if (isExpanded) MaterialTheme.colors.primary else MaterialTheme.colors.surface
             )
 
             // 클릭을 하면 isExpanded 값을 변경
             Column(modifier =  Modifier.clickable { isExpanded = isExpanded.not() }) {
                 Text(
                     text = msg.author,
-                    color = MaterialTheme.colorScheme.secondary,
-                    style = MaterialTheme.typography.titleSmall
+                    color = MaterialTheme.colors.secondary,
+                    style = MaterialTheme.typography.body2
                 )
                 Spacer(modifier = Modifier.height(4.dp))
 
                 // 선언한 애니메이션은 Surface에서 사용
                 // 크기가 변경되는 애니메이션은 modifier를 사용... 뭔가 일관성이 없는거 같음...
-                Surface(shape = MaterialTheme.shapes.medium, shadowElevation = 1.dp, color = surfaceColor, modifier = Modifier.animateContentSize().padding(4.dp)) {
+                Surface(shape = MaterialTheme.shapes.medium, elevation = 1.dp, color = surfaceColor, modifier = Modifier.animateContentSize().padding(4.dp)) {
                     Text(
                         text = msg.body,
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.body2,
                         modifier = Modifier.padding(all = 4.dp),
                         // 클릭으로 isExpanded가 변경되고 mutableStateOf에서 변경된 상태를 감지하고 재구성함
                         maxLines = if (isExpanded) Int.MAX_VALUE else 1
