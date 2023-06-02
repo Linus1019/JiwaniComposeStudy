@@ -30,13 +30,13 @@ fun FavoriteCollectionCard(@DrawableRes image: Int, @StringRes text: Int, modifi
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.width(192.dp)) {
             Image(
-                painter = painterResource(id = R.drawable.fc2_nature_meditations),
+                painter = painterResource(id = image),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.size(56.dp)
             )
             Text(
-                text = stringResource(id = R.string.fc2_nature_meditations),
+                text = stringResource(id = text),
                 style = MaterialTheme.typography.body2,
                 modifier = Modifier.padding(8.dp)
             )
