@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
+import com.example.jiwanicomposestudy.steps.layout.HomeScreen
+import com.example.jiwanicomposestudy.steps.layout.MySoothepp
 import com.example.jiwanicomposestudy.steps.tutorial.Step1
 import com.example.jiwanicomposestudy.ui.theme.JiwaniComposeStudyTheme
 
@@ -22,11 +24,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background
                 ) {
                     //MessageCard(msg = Message("jiwan's", "study"))
-                    Step1().PreviewConversation()
+                    MySoothepp()
                 }
             }
         }
     }
 }
-
-
