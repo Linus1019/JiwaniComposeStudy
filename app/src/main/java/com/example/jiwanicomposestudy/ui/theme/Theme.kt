@@ -53,3 +53,8 @@ fun JiwaniComposeStudyTheme(darkTheme: Boolean = isSystemInDarkTheme(), content:
         content = content
     )
 }
+
+@Composable
+fun JetnewsTheme() {
+
+}
