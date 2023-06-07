@@ -5,7 +5,7 @@ import androidx.annotation.StringRes
 import com.example.jiwanicomposestudy.R
 import com.example.jiwanicomposestudy.steps.tutorial.Step1.Message
 
-object SampleData {
+object MessageData {
     // Sample conversation data
     val conversationSample = listOf(
         Message(

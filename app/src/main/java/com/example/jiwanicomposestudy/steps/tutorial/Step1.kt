@@ -30,7 +30,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.jiwanicomposestudy.R
-import com.example.jiwanicomposestudy.smaples.SampleData
+import com.example.jiwanicomposestudy.smaples.MessageData
 import com.example.jiwanicomposestudy.ui.theme.JiwaniComposeStudyTheme
 
 class Step1 {
@@ -84,7 +84,7 @@ class Step1 {
     @Preview
     fun PreviewConversation() {
         JiwaniComposeStudyTheme {
-            Conversation(messages = SampleData.conversationSample)
+            Conversation(messages = MessageData.conversationSample)
         }
     }
 

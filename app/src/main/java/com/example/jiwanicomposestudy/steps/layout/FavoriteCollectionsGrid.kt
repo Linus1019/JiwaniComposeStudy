@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.jiwanicomposestudy.smaples.SampleData
+import com.example.jiwanicomposestudy.smaples.MessageData
 
 @Composable
 fun FavoriteCollectionsGrid(modifier: Modifier = Modifier) {
@@ -21,7 +21,7 @@ fun FavoriteCollectionsGrid(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier.height(120.dp)
     ) {
-        items(SampleData.favoriteCollectionsData) {
+        items(MessageData.favoriteCollectionsData) {
             FavoriteCollectionCard(image = it.drawable, text = it.text, modifier = Modifier.height(56.dp))
         }
     }

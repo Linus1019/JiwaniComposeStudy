@@ -39,13 +39,14 @@ import androidx.compose.ui.unit.dp
 import com.example.jiwanicomposestudy.R
 import com.example.jiwanicomposestudy.smaples.Post
 import com.example.jiwanicomposestudy.smaples.PostRepo
+import com.example.jiwanicomposestudy.steps.theme.JetnewsTheme
 import java.util.Locale
 
 @Composable
 fun Home() {
     val featured = remember { PostRepo.getFeaturedPost() }
     val posts = remember { PostRepo.getPosts() }
-    MaterialTheme {
+    JetnewsTheme {
         Scaffold(
             topBar = { AppBar() }
         ) { innerPadding ->
@@ -202,7 +203,9 @@ private fun PostItemPreview() {
 @Composable
 private fun FeaturedPostPreview() {
     val post = remember { PostRepo.getFeaturedPost() }
-    FeaturedPost(post = post)
+    JetnewsTheme {
+        FeaturedPost(post = post)
+    }
 }
 
 @Preview("Home")
