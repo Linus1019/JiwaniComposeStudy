@@ -1,7 +1,13 @@
 package com.example.jiwanicomposestudy.steps.animations
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -11,6 +17,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -112,6 +120,38 @@ fun animateAsState() {
 
                 }
             }*/
+        }
+
+        EditMessage(shown = editMessageShown)
+    }
+}
+
+@Composable
+private fun EditMessage(shown: Boolean) {
+    AnimatedVisibility(
+        visible = shown,
+        /*enter = slideInVertically(),
+        exit = slideOutVertically()*/
+        enter = slideInVertically(
+            initialOffsetY = { fullHeight -> -fullHeight },
+            animationSpec = tween(durationMillis = 150, easing = LinearOutSlowInEasing)
+        ),
+        exit = slideOutVertically(
+            targetOffsetY = { fullHeight -> -fullHeight },
+            animationSpec = tween(durationMillis = 250, easing = FastOutLinearInEasing)
+        )
+    ) {
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            color = MaterialTheme.colors.secondary,
+            elevation = 4.dp
+        ) {
+            Text(
+                text = stringResource(id = R.string.edit_message),
+                modifier = Modifier.padding(16.dp)
+            ) 
+            
+            
         }
     }
 }
@@ -218,6 +258,12 @@ fun HomeTab(
     }
 }
 
+@Preview
+@Composable
+fun PreviewAnimateAsState() {
+    animateAsState()
+}
+
 @Composable
 fun HomeFloatingActionButton(
     extended: Boolean,
@@ -232,13 +278,21 @@ fun HomeFloatingActionButton(
                 contentDescription = null
             )
 
-            if (extended) {
+            AnimatedVisibility(extended) {
                 Text(
                     text = stringResource(id = R.string.edit),
                     modifier = Modifier.padding(start = 8.dp, top = 3.dp)
                 )
             }
         }
+    }
+}
+
+@Preview 
+@Composable
+private fun PreviewHomeFloatingActionButton() {
+    HomeFloatingActionButton(extended = true) {
+        
     }
 }
 
