@@ -7,7 +7,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.material.primarySurface
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.ui.Modifier
+import com.example.jiwanicomposestudy.steps.animations.Green300
+import com.example.jiwanicomposestudy.steps.animations.HomeTabBar
+import com.example.jiwanicomposestudy.steps.animations.Purple100
+import com.example.jiwanicomposestudy.steps.animations.TabPage
+import com.example.jiwanicomposestudy.steps.animations.animateAsState
 import com.example.jiwanicomposestudy.steps.layout.MySoothepp
 import com.example.jiwanicomposestudy.steps.theme.JetnewsTheme
 class MainActivity : ComponentActivity() {
@@ -22,7 +28,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.primarySurface
                 ) {
                     //MessageCard(msg = Message("jiwan's", "study"))
-                    MySoothepp()
+                    //MySoothepp()
+                    animateAsState()
                 }
             }
         }
