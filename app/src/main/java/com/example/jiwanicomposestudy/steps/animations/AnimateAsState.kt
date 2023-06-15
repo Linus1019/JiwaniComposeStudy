@@ -1,15 +1,26 @@
 package com.example.jiwanicomposestudy.steps.animations
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColor
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,18 +32,22 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarDefaults.backgroundColor
@@ -40,20 +55,27 @@ import androidx.compose.material.Surface
 import androidx.compose.material.TabPosition
 import androidx.compose.material.TabRow
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.modifier.modifierLocalConsumer
@@ -64,6 +86,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.jiwanicomposestudy.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -74,15 +97,19 @@ enum class TabPage {
 }
 
 @Composable
-fun animateAsState() {
+fun AnimateAsState() {
+    val allTasks = stringArrayResource(id = R.array.tasks)
     val allTopics = stringArrayResource(id = R.array.topics).toList()
 
     var tabPage by remember { mutableStateOf(TabPage.Home) }
     val lazyListState = rememberLazyListState()
 
-    val weatherLoading by remember { mutableStateOf(false) }
+    val tasks = remember { mutableStateListOf(*allTasks) }
+
+    var weatherLoading by remember { mutableStateOf(false) }
     var editMessageShown by remember { mutableStateOf(false) }
     var expandedTopic by remember { mutableStateOf<String?>(null) }
+
     val coroutineScope = rememberCoroutineScope()
 
     suspend fun showEditMessage() {
@@ -91,6 +118,18 @@ fun animateAsState() {
             delay(3000L)
             editMessageShown = false
         }
+    }
+
+    suspend fun loadWeather() {
+        if (weatherLoading.not()) {
+            weatherLoading = true
+            delay(3000L)
+            weatherLoading = false
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        loadWeather()
     }
 
     //val backgroundColor = if (tabPage == TabPage.Home) Purple100 else Green300
@@ -123,16 +162,25 @@ fun animateAsState() {
         ) {
             item { Header(title = stringResource(R.string.weather)) }
             item { Spacer(modifier = Modifier.height(16.dp)) }
+
             item {
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     elevation = 2.dp
                 ) {
                     if (weatherLoading) {
-
+                        LoadingRow()
+                    } else {
+                        WeatherRow(onRefresh = {
+                            coroutineScope.launch {
+                                loadWeather()
+                            }
+                        })
                     }
                 }
             }
+
+            item { Spacer(modifier = Modifier.height(32.dp)) }
 
             item { Header(title = stringResource(id = R.string.topics)) }
             item { Spacer(modifier = Modifier.height(16.dp)) }
@@ -145,10 +193,69 @@ fun animateAsState() {
                     }
                 )
             }
+
+            item { Spacer(modifier = Modifier.height(32.dp)) }
+
+            item { Header(title = stringResource(id = R.string.tasks)) }
+            item { Spacer(modifier = Modifier.height(16.dp)) }
+            if (tasks.isEmpty()) {
+                item {
+                    TextButton(
+                        onClick = {
+                            tasks.clear()
+                            tasks.addAll(allTasks)
+                        }) {
+                        Text(text = stringResource(R.string.add_tasks))
+                    }
+                }
+            }
         }
 
         EditMessage(shown = editMessageShown)
     }
+}
+
+@Composable
+private fun LoadingRow() {
+    val infiniteTransition = rememberInfiniteTransition()
+    val alpha by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = keyframes {
+                durationMillis = 1000
+                0.7f at 500
+            },
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+
+    Row(
+        modifier = Modifier
+            .heightIn(min = 64.dp)
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(Color.LightGray.copy(alpha = alpha))
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(32.dp)
+                .background(Color.LightGray.copy(alpha = alpha))
+        )
+    }
+}
+
+@Composable
+@Preview
+fun PreviewLoadingRow() {
+    LoadingRow()
 }
 
 @Composable
@@ -265,6 +372,32 @@ private fun LazyListState.isScrollingUp(): Boolean {
 }
 
 @Composable
+fun WeatherRow(onRefresh: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .heightIn(min = 64.dp)
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(Amber600)
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(text = stringResource(id = R.string.temperature), fontSize = 24.sp)
+        Spacer(modifier = Modifier.weight(1f))
+        IconButton(onClick = onRefresh) {
+            Icon(
+                imageVector = Icons.Default.Refresh,
+                contentDescription = stringResource(id = R.string.refresh)
+            )
+        }
+    }
+}
+
+@Composable
 fun HomeTabBar(
     backgroundColor: Color,
     tabPage: TabPage,
@@ -295,9 +428,59 @@ fun HomeTabIndicator(
     tabPositions: List<TabPosition>,
     tabPage: TabPage
 ) {
-    val indicatorLeft = tabPositions[tabPage.ordinal].left
+    /*val indicatorLeft = tabPositions[tabPage.ordinal].left
     val indicatorRight = tabPositions[tabPage.ordinal].right
     val backgroundColor = if (tabPage == TabPage.Home) Purple700 else Green800
+*/
+    /*val transition = updateTransition(tabPage, label = "Tab indicator")
+    val indicatorLeft by transition.animateDp(label = "Indicator Left") { page ->
+        tabPositions[page.ordinal].left
+    }
+
+    val indicatorRight by transition.animateDp(label = "Indicator Right") { page ->
+        tabPositions[page.ordinal].right
+    }
+
+    val color by transition.animateColor(label = "Border color") { page ->
+        if (page == TabPage.Home) Purple700 else Green800
+    }*/
+
+    val transition = updateTransition(
+        tabPage,
+        label = "Tab indicator"
+    )
+
+    val indicatorLeft by transition.animateDp(
+        transitionSpec = {
+            if (TabPage.Home isTransitioningTo TabPage.Work) {
+                spring(stiffness = Spring.StiffnessVeryLow)
+            } else {
+                spring(stiffness = Spring.StiffnessMedium)
+            }
+        },
+        label = "Indicator left"
+    ) { page ->
+        tabPositions[page.ordinal].left
+    }
+
+    val indicatorRight by transition.animateDp(
+        transitionSpec = {
+            if (TabPage.Home isTransitioningTo TabPage.Work) {
+                spring(stiffness = Spring.StiffnessMedium)
+            } else {
+                spring(stiffness = Spring.StiffnessVeryLow)
+            }
+        },
+        label = "Indicator right"
+    ) { page ->
+        tabPositions[page.ordinal].right
+    }
+
+    val color by transition.animateColor(
+        label = "Border color"
+    ) { page ->
+        if (page == TabPage.Home) Purple700 else Green800
+    }
 
     Box(
         Modifier
@@ -308,7 +491,7 @@ fun HomeTabIndicator(
             .padding(4.dp)
             .fillMaxSize()
             .border(
-                BorderStroke(2.dp, backgroundColor),
+                BorderStroke(2.dp, color),
                 RoundedCornerShape(4.dp)
             )
     )
@@ -340,7 +523,7 @@ fun HomeTab(
 @Preview
 @Composable
 fun PreviewAnimateAsState() {
-    animateAsState()
+    AnimateAsState()
 }
 
 @Composable
@@ -398,3 +581,4 @@ private fun PreviewHomeTab() {
         )
     }
 }
+
