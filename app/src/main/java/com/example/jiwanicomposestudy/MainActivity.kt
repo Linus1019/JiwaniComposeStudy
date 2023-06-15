@@ -8,8 +8,8 @@ import androidx.compose.material.Surface
 import androidx.compose.material.primarySurface
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Modifier
-import com.example.jiwanicomposestudy.steps.animations.AnimateAsState
-import com.example.jiwanicomposestudy.steps.animations.AnimationTheme
+import com.example.jiwanicomposestudy.steps.composestates.BasicStateCodelabTheme
+import com.example.jiwanicomposestudy.steps.composestates.WellnessScreen
 
 class MainActivity : ComponentActivity() {
 
@@ -17,14 +17,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         // composable 함수를 호출하여 레이아웃을 표현
         setContent {
-            AnimationTheme {
+            BasicStateCodelabTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
-                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.primarySurface
+                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background
                 ) {
                     //MessageCard(msg = Message("jiwan's", "study"))
                     //MySoothepp()
-                    AnimateAsState()
+                    //AnimateAsState()
+                    WellnessScreen()
                 }
             }
         }

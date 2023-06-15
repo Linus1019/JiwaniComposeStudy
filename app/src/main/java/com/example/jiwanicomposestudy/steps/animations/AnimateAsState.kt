@@ -104,11 +104,9 @@ import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
-
 enum class TabPage {
     Home, Work
 }
-
 @Composable
 fun AnimateAsState() {
     val allTasks = stringArrayResource(id = R.array.tasks)
