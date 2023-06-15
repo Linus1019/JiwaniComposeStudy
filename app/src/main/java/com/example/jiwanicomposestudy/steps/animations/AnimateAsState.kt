@@ -4,13 +4,14 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.calculateTargetValue
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -19,10 +20,13 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.splineBasedDecay
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.horizontalDrag
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -58,6 +62,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
@@ -78,6 +83,10 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.consumePositionChange
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
@@ -85,11 +94,15 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jiwanicomposestudy.R
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 
 
 enum class TabPage {
@@ -206,6 +219,18 @@ fun AnimateAsState() {
                             tasks.addAll(allTasks)
                         }) {
                         Text(text = stringResource(R.string.add_tasks))
+                    }
+                }
+            }
+            items(count = tasks.size) { i ->
+                val task = tasks.getOrNull(i)
+
+                if (task != null) {
+                    key(task) {
+                        TaskRow(
+                            task = task,
+                            onRemove = { tasks.remove(task) }
+                        )
                     }
                 }
             }
@@ -367,8 +392,8 @@ private fun LazyListState.isScrollingUp(): Boolean {
                 previousIndex = firstVisibleItemIndex
                 previousScrollOffset = firstVisibleItemScrollOffset
             }
-        }.value
-    }
+        }
+    }.value
 }
 
 @Composable
@@ -582,3 +607,74 @@ private fun PreviewHomeTab() {
     }
 }
 
+@Composable
+fun TaskRow(task: String, onRemove: () -> Unit) {
+    Surface(modifier = Modifier
+        .fillMaxWidth()
+        .swipeToDismiss(onRemove),
+    elevation = 2.dp
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Check,
+                contentDescription = null
+            )
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Text(
+                text = task,
+                style = MaterialTheme.typography.body1
+            )
+        }
+    }
+}
+private fun Modifier.swipeToDismiss(
+    onDismissed: () -> Unit
+): Modifier = composed {
+    val offsetX = remember { Animatable(0f) }
+    pointerInput(Unit) {
+        val decay = splineBasedDecay<Float>(this)
+        coroutineScope {
+            while(true) {
+                val pointerId = awaitPointerEventScope {
+                    awaitFirstDown().id
+                }
+                offsetX.stop()
+                val velocityTracker = VelocityTracker()
+                awaitPointerEventScope {
+                    horizontalDrag(pointerId) { change ->
+                        val horizontalDragOffset = offsetX.value + change.positionChange().x
+                        launch {
+                            offsetX.snapTo(horizontalDragOffset)
+                        }
+                        velocityTracker.addPosition(change.uptimeMillis, change.position)
+                        change.consumePositionChange()
+                    }
+                }
+
+                val velocity = velocityTracker.calculateVelocity().x
+                val targetOffsetX = decay.calculateTargetValue(offsetX.value, velocity)
+
+                offsetX.updateBounds(
+                    lowerBound = -size.width.toFloat(),
+                    upperBound = size.width.toFloat()
+                )
+
+                launch {
+                    if (targetOffsetX.absoluteValue <= size.width) {
+                        offsetX.animateTo(targetValue = 0f, initialVelocity = velocity)
+                    } else {
+                        offsetX.animateDecay(velocity, decay)
+                        onDismissed()
+                    }
+                }
+            }
+        }
+    }
+        .offset { IntOffset(offsetX.value.roundToInt(), 0) }
+}
