@@ -42,12 +42,12 @@ fun WellnessTaskItem (
         )
 
         IconButton(onClick = onClose) {
-            Icon(Icons.Filled.Close, contentDescription = null)
+            Icon(Icons.Filled.Close, contentDescription = "Close")
         }
     }
 }
 
-@Composable
+/*@Composable
 fun WellnessTaskItem(taskName: String, onClose: () -> Unit, modifier: Modifier = Modifier) {
     var checkedState by rememberSaveable { mutableStateOf(false) }
 
@@ -58,8 +58,7 @@ fun WellnessTaskItem(taskName: String, onClose: () -> Unit, modifier: Modifier =
         onClose = onClose,
         modifier = modifier
     )
-
-}
+}*/
 
 @Composable
 @Preview

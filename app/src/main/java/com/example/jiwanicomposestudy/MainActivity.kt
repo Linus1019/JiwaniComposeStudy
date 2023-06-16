@@ -8,6 +8,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.primarySurface
 import androidx.compose.material.MaterialTheme
 import androidx.compose.ui.Modifier
+import com.example.jiwanicomposestudy.steps.animations.AnimateAsState
 import com.example.jiwanicomposestudy.steps.composestates.BasicStateCodelabTheme
 import com.example.jiwanicomposestudy.steps.composestates.WellnessScreen
 

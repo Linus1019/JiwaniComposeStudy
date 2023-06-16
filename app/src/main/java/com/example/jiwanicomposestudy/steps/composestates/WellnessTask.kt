@@ -1,8 +1,11 @@
 package com.example.jiwanicomposestudy.steps.composestates
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.*
 
-data class WellnessTask(val id: Int, val label: String)
+class WellnessTask(
+    val id: Int,
+    val label: String,
+    initialChecked: Boolean = false
+) {
+    var checked: Boolean by mutableStateOf(initialChecked)
+}

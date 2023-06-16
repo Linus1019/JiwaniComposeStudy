@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun WaterCounter(modifier: Modifier = Modifier) {
     Column(modifier = modifier.padding(16.dp)) {
-        var count by rememberSaveable { mutableStateOf(0) }
+        var count by remember { mutableStateOf(0) }
 
         if (count > 0) {
             var showTask by remember { mutableStateOf(true) }
@@ -61,8 +61,8 @@ fun StatelessCounter(count: Int, onIncrement: () -> Unit, modifier: Modifier = M
 
 @Composable
 fun StatefulCounter(modifier: Modifier = Modifier) {
-    var waterCount by remember { mutableStateOf(0) }
-    var juiceCount by remember { mutableStateOf(0) }
+    var waterCount by rememberSaveable { mutableStateOf(0) }
+    var juiceCount by rememberSaveable { mutableStateOf(0) }
 
     StatelessCounter(count = waterCount, { waterCount++ }, modifier)
     StatelessCounter(count = juiceCount, { juiceCount++ }, modifier)
